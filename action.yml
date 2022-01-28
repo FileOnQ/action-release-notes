@@ -1,0 +1,42 @@
+  name: "FileOnQ GitHub Release Notes"
+  description: "GitHub release notes and changelog generator using Gren"
+  author: "FileOnQ"
+  inputs:
+    token:
+      description: 'token to use for authentication for GitHub APIs'
+      required: true
+    username: 
+      description: 'username to use for creating gren release'
+      required: true
+    organization:
+      description: 'GitHub Organization Name'
+      required: true
+    repository:
+      description: 'Name of the repository'
+      required: true
+    version_number:
+      description: 'tag name'
+      required: true
+    options:  # Add the gren options here
+      description: 'Add the gren options here; e.g. " --override --ignore-tags-with="preview"'
+      required: false
+      default: ''
+    
+  runs:
+    using: "composite"
+    steps:
+      - run: npm install github-release-notes -g
+        shell: pwsh
+      - run: gren release --username=${{ inputs.username }} --token=${{ inputs.token }} --repo=${{ inputs.repository }} ${{ inputs.options }}"
+        shell: pwsh
+      - run: |
+          $release = Invoke-WebRequest -URI https://api.github.com/repos/${{ inputs.organization }}/${{ inputs.repository }}/releases/tags/v${{ inputs.version_number }} -Method GET -Headers @{"Accept"="application/vnd.github.v3+json"} -UseBasicParsing
+          $releaseContent = ConvertFrom-Json $release.Content
+          $generateNotes = Invoke-WebRequest -URI https://api.github.com/repos/${{ inputs.organization }}/${{ inputs.repository }}/releases/generate-notes -Method POST -Headers @{"Authorization"="Bearer ${{ inputs.token }}"; "Accept"="application/vnd.github.v3+json"} -Body '{"tag_name":"${{ inputs.version_number }}"}' -UseBasicParsing
+          $generateNotesContent = ConvertFrom-Json $generateNotes.Content
+          $body = $releaseContent.Body + $generateNotesContent.Body
+          echo $body
+          $uri = "https://api.github.com/repos/${{ inputs.organization }}/${{ inputs.repository }}/releases/" + $releaseContent.id
+          $json = ConvertTo-Json @{"body"=$body} -Compress
+          $response = Invoke-RestMethod -URI $uri -Method PATCH -Headers @{"Authorization"="Bearer ${{ inputs.token }}"; "Accept"="application/vnd.github.v3+json"} -Body $json -UseBasicParsing -ContentType "text/plain; charset=utf-8"
+        shell: pwsh
