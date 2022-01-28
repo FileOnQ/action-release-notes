@@ -27,7 +27,7 @@
     steps:
       - run: npm install github-release-notes -g
         shell: pwsh
-      - run: gren release --username=${{ inputs.username }} --token=${{ inputs.token }} --repo=${{ inputs.repository }} ${{ inputs.options }}"
+      - run: gren release --username=${{ inputs.username }} --token=${{ inputs.token }} --repo=${{ inputs.repository }} ${{ inputs.options }}
         shell: pwsh
       - run: |
           $release = Invoke-WebRequest -URI https://api.github.com/repos/${{ inputs.organization }}/${{ inputs.repository }}/releases/tags/v${{ inputs.version_number }} -Method GET -Headers @{"Accept"="application/vnd.github.v3+json"} -UseBasicParsing
