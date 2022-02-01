@@ -46,7 +46,7 @@ module.exports = {
   uses: FileOnQ/action-release-notes@v1.2
   with:
     token : GITHUB_TOKEN_THAT_HAS_PERMISSIONS
-    username : 'Username'
+    username : USERNAME
     organization : 'FileOnQ'
     repository : 'Imaging.Heif'
     version_number : PACKAGE_VERSION
