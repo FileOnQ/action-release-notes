@@ -45,10 +45,10 @@ module.exports = {
 ```yaml
   uses: FileOnQ/action-release-notes@v1.2
   with:
-    token : ${{ secrets.GITHUB_TOKEN }}
-    username : 'FileOnQ'
+    token : GITHUB_TOKEN_THAT_HAS_PERMISSIONS
+    username : 'Username'
     organization : 'FileOnQ'
-    repository : 'MobileOnQ'
-    version_number : '${{ env.PACKAGE_VERSION }}'
+    repository : 'Imaging.Heif'
+    version_number : PACKAGE_VERSION
     options: '--override --ignore-tags-with="preview"'
 ```
